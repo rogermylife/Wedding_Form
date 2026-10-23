@@ -130,14 +130,17 @@
       <!-- 經典副標 SAVE THE DATE -->
       <p class="font-cormorant tracking-[0.35em] uppercase text-xs md:text-sm text-wedding-sandstoneLight font-semibold mb-2">
         SAVE THE DATE
-      </p>6
+      </p>
       
       <!-- 主新人標題 -->
       <h1 class="font-cormorant text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-wide text-white drop-shadow-sm mb-3">
-        01Roger <span class="italic text-wedding-brickRed mx-1">&</span> YaYun
+        Roger <span class="italic text-wedding-brickRed mx-1">&</span> YaYun
       </h1>
 
       <!-- 溫馨邀約文字與婚期 -->
+       <p class="text-sm sm:text-base md:text-lg font-light tracking-widest text-[#F0E9DE]/95 mb-1.5 drop-shadow">
+        胡裕人 & 蕭雅云
+      </p>
       <p class="text-sm sm:text-base md:text-lg font-light tracking-widest text-[#F0E9DE]/95 mb-1.5 drop-shadow">
         期待與您共享這特別的一天
       </p>
@@ -253,7 +256,7 @@
               <p class="text-[12px] md:text-base text-wedding-charcoal/75 mt-1">
                 <span class="nowrap-text font-medium text-wedding-brickRed">17:00 迎賓入場</span>
                 <span class="mx-[3px] text-wedding-sandstone">|</span>
-                <span class="nowrap-text font-medium text-wedding-charcoal">18:00 晚宴開始15</span>
+                <span class="nowrap-text font-medium text-wedding-charcoal">18:00 晚宴開始</span>
               </p>
             </div>
           </div>
@@ -376,20 +379,32 @@
                  name="entry.300528326" 
                  value="" 
                  required 
-                 placeholder="example@mail.com" 
+                 list="free-email-domains"
+                 placeholder="我們將寄送電子喜帖給您" 
                  class="w-full px-4 py-3 rounded-xl border border-wedding-sandstone/50 bg-white/90 text-wedding-charcoal placeholder-wedding-charcoal/30 focus:outline-none focus:ring-2 focus:ring-wedding-brickRed/40 focus:border-wedding-brickRed transition-all duration-200">
+          <datalist id="free-email-domains">
+            <option value="gmail.com"></option>
+            <option value="yahoo.com.tw"></option>
+            <option value="hotmail.com"></option>
+            <option value="outlook.com"></option>
+            <option value="icloud.com"></option>
+            <option value="live.com"></option>
+            <option value="msn.com"></option>
+            <option value="proton.me"></option>
+          </datalist>
+          <div id="emailSuggestions" class="mt-2 hidden flex flex-wrap gap-2"></div>
         </div>
 
         <!-- 欄位 3: 紙本喜帖收件地址 PRINTED WEDDING INVITATION -->
         <div>
           <label for="entry_773929273" class="block text-xs md:text-sm font-medium text-wedding-retroBlue mb-2 tracking-wider">
-            紙本喜帖收件地址 <span class="font-cormorant tracking-widest text-wedding-sandstone text-xs font-semibold">PRINTED WEDDING INVITATION</span>
+            紙本喜帖收件地址 <span class="font-cormorant tracking-widest text-wedding-sandstone text-xs font-semibold">ADDRESS</span>
           </label>
           <input type="text" 
                  id="entry_773929273" 
                  name="entry.773929273" 
                  value="" 
-                 placeholder="請輸入紙本喜帖收件地址" 
+                 placeholder="若想收到紙本喜帖請填寫" 
                  class="w-full px-4 py-3 rounded-xl border border-wedding-sandstone/50 bg-white/90 text-wedding-charcoal placeholder-wedding-charcoal/30 focus:outline-none focus:ring-2 focus:ring-wedding-brickRed/40 focus:border-wedding-brickRed transition-all duration-200">
         </div>
 
@@ -403,13 +418,12 @@
                   required 
                   class="w-full px-4 py-3 rounded-xl border border-wedding-sandstone/50 bg-white/90 text-wedding-charcoal focus:outline-none focus:ring-2 focus:ring-wedding-brickRed/40 focus:border-wedding-brickRed transition-all duration-200">
             <option value="" selected disabled>請選擇關係</option>
-            <option value="男方親戚">男方親戚</option>
-            <option value="女方親戚">女方親戚</option>
-            <option value="新郎同學、朋友">新郎同學、朋友</option>
-            <option value="新娘同學、朋友">新娘同學、朋友</option>
-            <option value="新郎同事">新郎同事</option>
-            <option value="新娘同事">新娘同事</option>
-            <option value="共同朋友">共同朋友</option>
+            <option value="男方家人親戚">男方家人親戚</option>
+            <option value="女方家人親戚">女方家人親戚</option>
+            <option value="男方同學、朋友">男方同學、朋友</option>
+            <option value="女方同學、朋友">女方同學、朋友</option>            
+            <option value="男方同事">男方同事</option>
+            <option value="女方同事">女方同事</option>
           </select>
         </div>
 
@@ -422,12 +436,11 @@
                  id="entry_1271661895" 
                  name="entry.1271661895" 
                  min="0" 
-                 max="10" 
+                 max="100" 
                  value="" 
                  required 
-                 placeholder="0 或實際出席人數" 
+                 placeholder="若不克出席，請填寫 0 即可" 
                  class="w-full px-4 py-3 rounded-xl border border-wedding-sandstone/50 bg-white/90 text-wedding-charcoal placeholder-wedding-charcoal/30 focus:outline-none focus:ring-2 focus:ring-wedding-brickRed/40 focus:border-wedding-brickRed transition-all duration-200">
-          <p class="text-xs text-wedding-charcoal/50 mt-1.5">若不克出席，請填寫 0 即可</p>
         </div>
 
         <!-- 智能表單邏輯容器：純空白欄位 -->
@@ -463,13 +476,13 @@
         <!-- 欄位 6: 給新人的祝福與備註 BLESSING -->
         <div>
           <label for="entry_1702588743" class="block text-xs md:text-sm font-medium text-wedding-retroBlue mb-2 tracking-wider">
-            給新人的祝福與備註 <span class="font-cormorant tracking-widest text-wedding-sandstone text-xs font-semibold">MESSAGE & BLESSINGS</span>
+            祝福與備註 <span class="font-cormorant tracking-widest text-wedding-sandstone text-xs font-semibold">MESSAGE & BLESSINGS</span>
           </label>
           <textarea id="entry_1702588743" 
                     name="entry.1702588743" 
                     rows="3" 
                     value="" 
-                    placeholder="寫下您給 Roger & YaYun 的祝福..." 
+                    placeholder="好期待參加婚禮！開趴開趴^^" 
                     class="w-full px-4 py-3 rounded-xl border border-wedding-sandstone/50 bg-white/90 text-wedding-charcoal placeholder-wedding-charcoal/30 focus:outline-none focus:ring-2 focus:ring-wedding-brickRed/40 focus:border-wedding-brickRed transition-all duration-200"></textarea>
         </div>
 
@@ -478,7 +491,7 @@
           <button type="submit" 
                   id="submitBtn" 
                   class="w-full py-4 rounded-xl bg-wedding-charcoal hover:bg-wedding-retroBlue text-wedding-ivory font-medium text-base tracking-widest shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2">
-            <span>確認送出回函</span>
+            <span>確認送出</span>
             <i class="fa-regular fa-paper-plane text-wedding-brickRed text-sm"></i>
           </button>
         </div>
@@ -489,9 +502,9 @@
         <div class="w-16 h-16 rounded-full bg-wedding-brickRed/10 border border-wedding-brickRed/30 flex items-center justify-center text-wedding-brickRed text-3xl mb-4">
           <i class="fa-solid fa-check"></i>
         </div>
-        <h3 class="text-2xl font-semibold text-wedding-retroBlue mb-2">回函已成功送出</h3>
+        <h3 class="text-2xl font-semibold text-wedding-retroBlue mb-2">已成功送出</h3>
         <p class="text-sm md:text-base text-wedding-charcoal/75 leading-relaxed max-w-sm mb-6">
-          衷心感謝您的回覆與祝福！<br>我們非常期待在 2027 年 4 月 17 日與您共度這個難忘的夜晚。
+          衷心感謝您的回覆與祝福！<br>期待 2027 年 4 月 17 日與您共度開心的夜晚～
         </p>
         <button type="button" 
                 onclick="resetFormState()" 
@@ -549,6 +562,83 @@
     const guestsInput = document.getElementById('entry_1271661895');
     const vegCountInput = document.getElementById('entry_281892954');
     const conditionalSection = document.getElementById('conditionalSection');
+    const emailInput = document.getElementById('entry_300528326');
+    const emailSuggestions = document.getElementById('emailSuggestions');
+    const freeEmailDomains = ['gmail.com', 'yahoo.com.tw', 'hotmail.com', 'outlook.com', 'icloud.com', 'live.com', 'msn.com', 'proton.me'];
+
+    function applyDomainSuggestion(domain) {
+      const value = emailInput.value.trim();
+      const atIndex = value.indexOf('@');
+      if (atIndex === -1) return;
+      const localPart = value.slice(0, atIndex);
+      emailInput.value = `${localPart}@${domain}`;
+      emailInput.focus();
+      const end = emailInput.value.length;
+      emailInput.setSelectionRange(end, end);
+      updateEmailSuggestions();
+    }
+
+    function updateEmailSuggestions() {
+      const value = emailInput.value.trim();
+      const atIndex = value.indexOf('@');
+
+      if (atIndex === -1 || atIndex === value.length - 1) {
+        emailSuggestions.classList.add('hidden');
+        emailSuggestions.innerHTML = '';
+        return;
+      }
+
+      const localPart = value.slice(0, atIndex);
+      const domain = value.slice(atIndex + 1).toLowerCase();
+
+      if (!localPart || !domain) {
+        emailSuggestions.classList.add('hidden');
+        emailSuggestions.innerHTML = '';
+        return;
+      }
+
+      const matches = freeEmailDomains.filter(item => item.startsWith(domain));
+      if (!matches.length) {
+        emailSuggestions.classList.add('hidden');
+        emailSuggestions.innerHTML = '';
+        return;
+      }
+
+      emailSuggestions.innerHTML = matches.map(item => `
+        <button type="button" data-domain="${item}" class="px-2.5 py-1 rounded-full border border-wedding-sandstone/50 bg-white text-[11px] md:text-xs text-wedding-retroBlue hover:border-wedding-brickRed hover:text-wedding-brickRed transition-colors">
+          ${localPart}@${item}
+        </button>
+      `).join('');
+      emailSuggestions.classList.remove('hidden');
+    }
+
+    emailInput.addEventListener('input', updateEmailSuggestions);
+
+    emailInput.addEventListener('keydown', function(event) {
+      if (event.key !== 'Tab' && event.key !== 'Enter') {
+        return;
+      }
+
+      const value = this.value.trim();
+      const atIndex = value.indexOf('@');
+      if (atIndex === -1 || atIndex === value.length - 1) {
+        return;
+      }
+
+      const domain = value.slice(atIndex + 1).toLowerCase();
+      const matches = freeEmailDomains.filter(item => item.startsWith(domain));
+
+      if (matches.length > 0) {
+        event.preventDefault();
+        applyDomainSuggestion(matches[0]);
+      }
+    });
+
+    emailSuggestions.addEventListener('click', function(event) {
+      const trigger = event.target.closest('[data-domain]');
+      if (!trigger) return;
+      applyDomainSuggestion(trigger.dataset.domain);
+    });
 
     guestsInput.addEventListener('input', function() {
       const count = parseInt(this.value, 10);
@@ -604,7 +694,7 @@
       if (window.isSubmitting || completedSubmission) return false;
       const guests = Number(guestsInput.value);
       const vegetarian = guests > 0 ? Number(vegCountInput.value || 0) : 0;
-      if (!Number.isInteger(guests) || guests < 0 || guests > 10 ||
+      if (!Number.isInteger(guests) || guests < 0 || guests > 100 ||
           !Number.isInteger(vegetarian) || vegetarian < 0 || vegetarian > guests) {
         alert('請確認出席及素食人數是否正確。');
         return false;
@@ -632,7 +722,7 @@
       const btn = document.getElementById('submitBtn');
       window.isSubmitting = true;
       btn.disabled = true;
-      btn.textContent = '正在確認回函是否入庫...';
+      btn.textContent = '上傳中...';
       try {
         // 重送前先查詢，避免第一次已成功但瀏覽器未收到確認。
         let status = await checkSaved(pendingSubmission.id).catch(() => null);
