@@ -79,14 +79,16 @@
       display: none;
     }
 
-    /* Hero 背景圖：手機版保持現有位置，桌面版往上調整 */
+    /* Hero 背景圖：手機版再往上 50px，桌面版維持原本站位 */
     #hero-image {
       object-position: center 18%;
+      transform: translateY(-50px);
     }
 
     @media (min-width: 768px) {
       #hero-image {
-        object-position: center 160%;
+        object-position: center 200%;
+        transform: translateY(0);
       }
     }
   </style>
