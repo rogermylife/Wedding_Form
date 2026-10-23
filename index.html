@@ -74,6 +74,53 @@
       border: 1px solid rgba(189, 166, 138, 0.35);
     }
 
+    .progress-step {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      color: rgba(48, 45, 43, 0.55);
+      transition: all 0.3s ease;
+    }
+
+    .progress-step .step-dot {
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(189, 166, 138, 0.18);
+      border: 1px solid rgba(189, 166, 138, 0.4);
+      color: #35556B;
+      font-size: 0.65rem;
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+
+    .progress-step.active {
+      color: #35556B;
+      font-weight: 600;
+    }
+
+    .progress-step.active .step-dot {
+      background: #35556B;
+      border-color: #35556B;
+      color: #fff;
+    }
+
+    .progress-step.done {
+      color: #A65B4D;
+      font-weight: 600;
+    }
+
+    .progress-step.done .step-dot {
+      background: #A65B4D;
+      border-color: #A65B4D;
+      color: #fff;
+    }
+
     /* 隱藏原生 details marker */
     details summary::-webkit-details-marker {
       display: none;
@@ -495,6 +542,29 @@
             <i class="fa-regular fa-paper-plane text-wedding-brickRed text-sm"></i>
           </button>
         </div>
+
+        <div id="uploadProgress" class="hidden mt-5 rounded-2xl border border-wedding-sandstone/40 bg-wedding-ivory/50 p-4">
+          <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div class="progress-step active" data-step="checking">
+              <span class="step-dot">1</span>
+              <span>檢查資料</span>
+            </div>
+            <div class="progress-step" data-step="sending">
+              <span class="step-dot">2</span>
+              <span>上傳中</span>
+            </div>
+            <div class="progress-step" data-step="confirming">
+              <span class="step-dot">3</span>
+              <span>確認完成</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="h-2 w-full overflow-hidden rounded-full bg-wedding-sandstone/30">
+              <div id="progressBar" class="h-full w-0 rounded-full bg-gradient-to-r from-wedding-retroBlue via-wedding-brickRed to-wedding-brickRed transition-all duration-500"></div>
+            </div>
+            <p id="progressText" class="mt-2 text-xs md:text-sm text-wedding-charcoal/70">準備整理回函資料...</p>
+          </div>
+        </div>
       </form>
 
       <!-- 送出成功的典雅提示彈窗 (純 CSS/DOM 顯示，取代 alert) -->
@@ -687,6 +757,28 @@
       card.querySelector('p').textContent = message;
       card.querySelector('button').textContent = success ? '再填一份回函' : '返回表單';
       card.classList.remove('hidden');
+      document.getElementById('uploadProgress').classList.add('hidden');
+    }
+
+    function updateUploadProgress(stepName, label, percent) {
+      const progressPanel = document.getElementById('uploadProgress');
+      const progressText = document.getElementById('progressText');
+      const progressBar = document.getElementById('progressBar');
+      const steps = document.querySelectorAll('.progress-step');
+
+      steps.forEach(step => {
+        const stepKey = step.dataset.step;
+        step.classList.remove('active', 'done');
+        if (stepKey === stepName) {
+          step.classList.add('active');
+        } else if (['checking', 'sending', 'confirming'].indexOf(stepKey) < ['checking', 'sending', 'confirming'].indexOf(stepName)) {
+          step.classList.add('done');
+        }
+      });
+
+      progressPanel.classList.remove('hidden');
+      progressText.textContent = label;
+      progressBar.style.width = `${Math.max(0, Math.min(100, percent))}%`;
     }
 
     function getErrorDetail(err) {
@@ -730,8 +822,10 @@
       const btn = document.getElementById('submitBtn');
       window.isSubmitting = true;
       btn.disabled = true;
-      btn.textContent = '上傳中......';
+      btn.innerHTML = '<span>上傳中...</span><i class="fa-solid fa-spinner fa-spin text-wedding-brickRed text-sm"></i>';
+      updateUploadProgress('checking', '正在檢查資料格式與人數設定...', 18);
       try {
+        updateUploadProgress('sending', '資料正傳送至系統，請稍候...', 45);
         // 重送前先查詢，避免第一次已成功但瀏覽器未收到確認。
         let status = await checkSaved(pendingSubmission.id).catch(() => null);
         if (!status || !status.saved) {
@@ -742,20 +836,24 @@
           });
           for (let i = 0; i < 8; i++) {
             await sleep(1200 + i * 300);
+            updateUploadProgress('sending', `資料上傳中... ${Math.min(90, 45 + (i + 1) * 5)}%`, 45 + (i + 1) * 5);
             status = await checkSaved(pendingSubmission.id).catch(() => null);
             if (status && status.saved) break;
           }
         }
         if (status && status.saved) {
+          updateUploadProgress('confirming', '已完成送出，正在確認回覆狀態...', 100);
           completedSubmission = true;
           pendingSubmission = null;
           showResult('完成！', '感謝您的回覆與祝福！期待 2027 年 4 月 17 日與您共度開心的夜晚～', true);
         } else {
+          updateUploadProgress('confirming', '資料已送出，但系統尚未確認成功；請勿重複送出...', 80);
           showResult('尚未確認回函', '目前無法確認資料是否已儲存。請先不要重複填寫；您可以返回表單按原資料重試，或聯絡新人確認。', false);
         }
       } catch (err) {
         const errorDetail = getErrorDetail(err);
         console.error('RSVP submit failed:', err);
+        updateUploadProgress('confirming', '傳送過程發生問題，請稍後再試...', 60);
         showResult('尚未確認回函', `網路連線或資料傳送發生問題，錯誤詳情：${errorDetail}。請返回表單使用原資料重試；系統會盡量避免重複寫入。`, false);
       } finally {
         window.isSubmitting = false;
@@ -767,6 +865,7 @@
 
     function resetFormState() {
       document.getElementById('successCard').classList.add('hidden');
+      document.getElementById('uploadProgress').classList.add('hidden');
       if (completedSubmission) {
         document.getElementById('weddingForm').reset();
         conditionalSection.classList.add('hidden');
