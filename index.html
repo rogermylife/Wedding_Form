@@ -709,12 +709,12 @@
         message: document.getElementById('entry_1702588743').value.trim()
       };
       // 保留尚未確認的 requestId，重試時使用相同 ID，避免產生重複資料。
-      if (!pendingSubmission) {
-        pendingSubmission = { id: crypto.randomUUID(), payload };
-      } else if (JSON.stringify(payload) !== JSON.stringify(pendingSubmission.payload)) {
-        alert('上一筆資料尚未確認，請勿修改後直接重送。請先聯絡新人確認。');
-        return false;
-      }
+      //if (!pendingSubmission) {
+      //  pendingSubmission = { id: crypto.randomUUID(), payload };
+      //} else if (JSON.stringify(payload) !== JSON.stringify(pendingSubmission.payload)) {
+      //  alert('上一筆資料尚未確認，請勿修改後直接重送。請先聯絡新人確認。');
+      //  return false;
+      //}
       const babyChairCount = Number(document.getElementById('entry_2001941814').value || 0);
       if (!Number.isInteger(babyChairCount) || babyChairCount < 0 || babyChairCount > guests) {
         alert('請確認兒童椅數量是否正確。'); return false;
@@ -741,7 +741,7 @@
         if (status && status.saved) {
           completedSubmission = true;
           pendingSubmission = null;
-          showResult('回函已成功送出', '我們已確認收到您的回函，感謝您的回覆與祝福！期待在 2027 年 4 月 17 日與您相聚。', true);
+          showResult('完成！', '感謝您的回覆與祝福！期待 2027 年 4 月 17 日與您共度開心的夜晚～', true);
         } else {
           showResult('尚未確認回函', '目前無法確認資料是否已儲存。請先不要重複填寫；您可以返回表單按原資料重試，或聯絡新人確認。', false);
         }
