@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>胡裕人・蕭雅云｜婚禮邀請函</title>
+  <title>test胡裕人・蕭雅云｜婚禮邀請函</title>
   <link rel="icon" type="image/svg+xml" href="favicon-heart.svg">
   
   <!-- Tailwind CSS -->
@@ -573,7 +573,7 @@
       </form>
 
       <!-- 送出成功的典雅提示彈窗 (純 CSS/DOM 顯示，取代 alert) -->
-      <div id="successCard" class="hidden absolute inset-0 bg-white/95 backdrop-blur-md rounded-3xl p-8 flex flex-col items-center justify-center text-center z-10 transition-all duration-500">
+      <div id="successCard" class="hidden absolute inset-0 overflow-y-auto bg-white/95 backdrop-blur-md rounded-3xl p-6 py-8 md:p-8 flex flex-col items-center justify-start text-center z-10 transition-all duration-500">
         <div class="w-16 h-16 rounded-full bg-wedding-brickRed/10 border border-wedding-brickRed/30 flex items-center justify-center text-wedding-brickRed text-3xl mb-4">
           <i class="fa-solid fa-check"></i>
         </div>
@@ -581,7 +581,16 @@
         <p class="result-message text-sm md:text-base text-wedding-charcoal/75 leading-relaxed max-w-sm mb-6">
           衷心感謝您的回覆與祝福！<br>期待 2027 年 4 月 17 日與您共度開心的夜晚～
         </p>
+        <div id="debugInfo" class="hidden w-full max-w-lg mb-5 rounded-xl border border-wedding-sandstone/50 bg-wedding-ivory/70 p-4 text-left">
+          <div class="flex items-center justify-between gap-3">
+            <h4 class="text-sm font-semibold text-wedding-retroBlue">除錯資訊（不含表單內容）</h4>
+            <button id="copyDebugInfo" type="button" class="shrink-0 rounded-full border border-wedding-sandstone px-3 py-1 text-xs text-wedding-charcoal/80 hover:border-wedding-brickRed hover:text-wedding-brickRed transition-colors">複製</button>
+          </div>
+          <pre id="debugInfoText" class="mt-3 max-h-36 overflow-auto whitespace-pre-wrap break-all text-left text-[11px] leading-relaxed text-wedding-charcoal/80"></pre>
+          <p id="debugCopyStatus" class="mt-2 text-xs text-wedding-charcoal/60">請複製這段資訊傳給協助排查的人。</p>
+        </div>
         <button type="button" 
+                id="resultActionButton"
                 onclick="resetFormState()" 
                 class="px-6 py-2 rounded-full border border-wedding-sandstone text-xs text-wedding-charcoal/80 hover:text-wedding-brickRed hover:border-wedding-brickRed transition-colors">
           修改回函資料
@@ -731,41 +740,102 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEUmWSjEZHudphtfUKjLnnTVt4mnHrNIcFxrDc3nZ5OgbVyT2rBqEf_9gQ40udFwQH/exec';
     let pendingSubmission = null;
     let completedSubmission = false;
+    let submissionDiagnostics = [];
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    function checkSaved(requestId) {
+    function addDiagnostic(stage, outcome, details, durationMs) {
+      submissionDiagnostics.push({
+        time: new Date().toISOString(),
+        stage,
+        outcome,
+        ...(details ? {details} : {}),
+        ...(Number.isFinite(durationMs) ? {durationMs} : {})
+      });
+    }
+
+    function checkSaved(requestId, stage) {
       return new Promise((resolve, reject) => {
         const callback = 'rsvpCallback_' + Math.random().toString(36).slice(2);
         const script = document.createElement('script');
         let settled = false;
+        const startedAt = Date.now();
         const cleanup = () => {
           delete window[callback];
           script.remove();
           clearTimeout(timer);
         };
         const timer = setTimeout(() => {
-          if (!settled) { settled = true; cleanup(); reject(new Error('查詢逾時')); }
+          if (!settled) {
+            settled = true;
+            cleanup();
+            addDiagnostic(stage, 'timeout', '等待 JSONP 回呼超過 8000ms；可能是網路、部署或伺服器回應問題。', Date.now() - startedAt);
+            reject(new Error('查詢逾時'));
+          }
         }, 8000);
         window[callback] = data => {
-          if (!settled) { settled = true; cleanup(); resolve(data); }
+          if (!settled) {
+            settled = true;
+            cleanup();
+            addDiagnostic(stage, data && data.saved ? 'saved' : 'not_saved', '查詢腳本已回覆。', Date.now() - startedAt);
+            resolve(data);
+          }
         };
         script.onerror = () => {
-          if (!settled) { settled = true; cleanup(); reject(new Error('查詢失敗')); }
+          if (!settled) {
+            settled = true;
+            cleanup();
+            addDiagnostic(stage, 'script_load_error', '瀏覽器無法載入狀態查詢腳本（script.onerror）；瀏覽器不會提供更細的網路錯誤原因。', Date.now() - startedAt);
+            reject(new Error('查詢失敗'));
+          }
         };
         script.src = SCRIPT_URL + '?action=status&id=' + encodeURIComponent(requestId)
           + '&callback=' + callback + '&_=' + Date.now();
+        addDiagnostic(stage, 'started', '發出狀態查詢：action=status。');
         document.head.appendChild(script);
       });
     }
 
-    function showResult(title, message, success) {
+    function showResult(title, message, success, diagnostics) {
       const card = document.getElementById('successCard');
       card.querySelector('h3').textContent = title;
       card.querySelector('p').textContent = message;
-      card.querySelector('button').textContent = success ? '再填一份回函' : '返回表單';
+      document.getElementById('resultActionButton').textContent = success ? '再填一份回函' : '返回表單';
+      const debugPanel = document.getElementById('debugInfo');
+      debugPanel.classList.toggle('hidden', !diagnostics);
+      if (diagnostics) {
+        document.getElementById('debugInfoText').textContent = JSON.stringify(diagnostics, null, 2);
+        document.getElementById('debugCopyStatus').textContent = '請複製這段資訊傳給協助排查的人。';
+      }
       card.classList.remove('hidden');
       document.getElementById('uploadProgress').classList.add('hidden');
     }
+
+    async function copyDebugInfo() {
+      const text = document.getElementById('debugInfoText').textContent;
+      const status = document.getElementById('debugCopyStatus');
+      try {
+        await navigator.clipboard.writeText(text);
+        status.textContent = '已複製除錯資訊。';
+      } catch {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.setAttribute('readonly', '');
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          const copied = document.execCommand('copy');
+          status.textContent = copied ? '已複製除錯資訊。' : '無法自動複製，請長按或選取上方文字複製。';
+        } catch {
+          status.textContent = '無法自動複製，請長按或選取上方文字複製。';
+        } finally {
+          textArea.remove();
+        }
+      }
+    }
+
+    document.getElementById('copyDebugInfo').addEventListener('click', copyDebugInfo);
 
     function updateUploadProgress(stepName, label, percent) {
       const progressPanel = document.getElementById('uploadProgress');
@@ -842,6 +912,8 @@
         alert('請確認兒童椅數量是否正確。'); return false;
       }
       const btn = document.getElementById('submitBtn');
+      submissionDiagnostics = [];
+      addDiagnostic('submission', 'started', '開始送出；僅記錄流程狀態，不記錄表單欄位。');
       window.isSubmitting = true;
       btn.disabled = true;
       btn.innerHTML = '<span>上傳中...</span><i class="fa-solid fa-spinner fa-spin text-wedding-brickRed text-sm"></i>';
@@ -855,21 +927,29 @@
         let lastStatusError = null;
         let status = null;
         try {
-          status = await checkSaved(pendingSubmission.id);
+          status = await checkSaved(pendingSubmission.id, '送出前查詢');
         } catch (err) {
           lastStatusError = err;
         }
         if (!status || !status.saved) {
-          await fetch(SCRIPT_URL, {
-            method: 'POST', mode: 'no-cors',
-            headers: {'Content-Type': 'text/plain;charset=utf-8'},
-            body: JSON.stringify({...pendingSubmission.payload, requestId: pendingSubmission.id})
-          });
+          try {
+            const postStartedAt = Date.now();
+            addDiagnostic('表單傳送', 'started', '以 POST/no-cors 傳送資料；瀏覽器無法讀取伺服器回應內容。');
+            await fetch(SCRIPT_URL, {
+              method: 'POST', mode: 'no-cors',
+              headers: {'Content-Type': 'text/plain;charset=utf-8'},
+              body: JSON.stringify({...pendingSubmission.payload, requestId: pendingSubmission.id})
+            });
+            addDiagnostic('表單傳送', 'request_resolved', '瀏覽器的 fetch 已完成；no-cors 模式下這不代表伺服器已成功寫入。', Date.now() - postStartedAt);
+          } catch (err) {
+            addDiagnostic('表單傳送', 'request_rejected', getErrorDetail(err));
+            throw err;
+          }
           for (let i = 0; i < 8; i++) {
             await sleep(1200 + i * 300);
             updateUploadProgress('sending', `資料上傳中... ${Math.min(90, 45 + (i + 1) * 5)}%`, 45 + (i + 1) * 5);
             try {
-              status = await checkSaved(pendingSubmission.id);
+              status = await checkSaved(pendingSubmission.id, `送出後確認 ${i + 1}/8`);
               lastStatusError = null;
             } catch (err) {
               status = null;
@@ -888,13 +968,30 @@
             ? `確認狀態查詢失敗：${getErrorDetail(lastStatusError)}`
             : '伺服器尚未回報資料已儲存。';
           updateUploadProgress('confirming', '資料已送出，但系統尚未確認成功；請勿重複送出...', 80);
-          showResult('尚未確認回函', `${reason} 請先不要重複填寫；您可以返回表單按原資料重試，或聯絡新人確認。`, false);
+          const diagnostics = {
+            createdAt: new Date().toISOString(),
+            requestId: pendingSubmission.id,
+            endpoint: SCRIPT_URL,
+            browserOnline: navigator.onLine,
+            language: navigator.language,
+            events: submissionDiagnostics
+          };
+          showResult('尚未確認回函', `${reason} 請先不要重複填寫；您可以返回表單按原資料重試，或聯絡新人確認。`, false, diagnostics);
         }
       } catch (err) {
         const errorDetail = getErrorDetail(err);
         console.error('RSVP submit failed:', err);
         updateUploadProgress('confirming', '傳送過程發生問題，請稍後再試...', 60);
-        showResult('尚未確認回函', `網路連線或資料傳送發生問題，錯誤詳情：${errorDetail}。請返回表單使用原資料重試；系統會盡量避免重複寫入。`, false);
+        const diagnostics = {
+          createdAt: new Date().toISOString(),
+          requestId: pendingSubmission && pendingSubmission.id,
+          endpoint: SCRIPT_URL,
+          browserOnline: navigator.onLine,
+          language: navigator.language,
+          fatalError: errorDetail,
+          events: submissionDiagnostics
+        };
+        showResult('尚未確認回函', `網路連線或資料傳送發生問題，錯誤詳情：${errorDetail}。請返回表單使用原資料重試；系統會盡量避免重複寫入。`, false, diagnostics);
       } finally {
         window.isSubmitting = false;
         btn.disabled = completedSubmission;
