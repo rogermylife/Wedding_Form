@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff0b3"/>
+      <stop offset=".38" stop-color="#d6a644"/>
+      <stop offset=".7" stop-color="#f8df91"/>
+      <stop offset="1" stop-color="#a66b22"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff9df" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#fff9df" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 56 8.8 33.2C-3 21.3 4.7 5 17.7 5 24 5 29 8.8 32 14c3-5.2 8-9 14.3-9C59.3 5 67 21.3 55.2 33.2L32 56Z" fill="url(#gold)" stroke="#563612" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M32 51 11.1 30.4C1.7 20.8 7.5 8.5 17.7 8.5c5.7 0 9.8 3.8 12.5 9.2" fill="none" stroke="url(#shine)" stroke-width="2.3" stroke-linecap="round"/>
+  <path d="M32 20c2.9-6.8 7.3-11.5 14.3-11.5 10.2 0 16 12.3 6.6 21.9L32 51" fill="none" stroke="#fff2c6" stroke-opacity=".72" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M32 22c-2 4.3-2 9.5 0 14 2-4.5 2-9.7 0-14Z" fill="#fff4cc" fill-opacity=".85"/>
+</svg>
