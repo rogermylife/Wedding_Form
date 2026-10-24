@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>test胡裕人・蕭雅云｜婚禮邀請函</title>
+  <title>test 2胡裕人・蕭雅云｜婚禮邀請函</title>
   <link rel="icon" type="image/svg+xml" href="favicon-heart.svg">
   
   <!-- Tailwind CSS -->
@@ -776,6 +776,11 @@
           if (!settled) {
             settled = true;
             cleanup();
+            if (data && data.error) {
+              addDiagnostic(stage, 'server_error', `狀態查詢後端錯誤代碼：${data.error}`, Date.now() - startedAt);
+              reject(new Error(`狀態查詢後端錯誤：${data.error}`));
+              return;
+            }
             addDiagnostic(stage, data && data.saved ? 'saved' : 'not_saved', '查詢腳本已回覆。', Date.now() - startedAt);
             resolve(data);
           }
